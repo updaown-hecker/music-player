@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ben's Playlist</title>
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <style>
+    body {
+      background-color: #000; /* black background */
+    }
+    .star {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 2px;
+      height: 2px;
+      background-color: #fff; /* white star */
+      border-radius: 50%;
+      transition: transform 0.5s; /* add transition for smooth movement */
+    }
+    .trail {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1px;
+      height: 1px;
+      background-color: #fff;
+      border-radius: 50%;
+    }
+    .explosion {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50px;
+      height: 50px;
+      background-color: #fff;
+      border-radius: 50%;
+      animation: explosion 0.5s ease-out;
+    }
+    @keyframes explosion {
+      0% {
+        transform: scale(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+    iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5yTybwSJQQv91pCp81p0oA?utm_source=generator" width="50%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+  <script>
+    // Create 1000 stars
+    for (let i = 0; i < 1000; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.top = `${Math.random() * 100}vh`;
+      star.style.left = `${Math.random() * 100}vw`;
+      document.body.appendChild(star);
+    }
+
+    // Create trail elements
+    const trailElements = [];
+    for (let i = 0; i < 100; i++) {
+      const trail = document.createElement('div');
+      trail.className = 'trail';
+      trailElements.push(trail);
+      document.body.appendChild(trail);
+    }
+
+    // Add event listeners
+    let mouseX = 0;
+    let mouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    document.addEventListener('click', (e) => {
+      // Create explosion effect
+      const explosion = document.createElement('div');
+      explosion.className = 'explosion';
+      explosion.style.top = `${e.clientY}px`;
+      explosion.style.left = `${e.clientX}px`;
+      document.body.appendChild(explosion);
+
+      // Remove explosion after 2 seconds
+      setTimeout(() => {
+        explosion.remove();
+      }, 1000);
+
+      // Move stars far away
+      const stars = document.querySelectorAll('.star');
+      stars.forEach((star) => {
+        star.style.transform = `translate(${Math.random() * 200 - 100}vw, ${Math.random() * 200 - 100}vh)`;
+      });
+    });
+
+    function update() {
+      requestAnimationFrame(update);
+
+      const stars = document.querySelectorAll('.star');
+      stars.forEach((star) => {
+        const dx = star.offsetLeft - mouseX;
+        const dy = star.offsetTop - mouseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < 100) {
+          const speed = 5; // adjust the speed of the stars
+          star.style.transform = `translate(${dx / distance * speed}px, ${dy / distance * speed}px)`;
+        }
+      });
+
+      // Update trail
+      for (let i = 0; i < trailElements.length; i++) {
+        const trail = trailElements[i];
+        trail.style.top = `${mouseY}px`;
+        trail.style.left = `${mouseX}px`;
+        if (i > 0) {
+          const prevTrail = trailElements[i - 1];
+          trail.style.transform = `translate(${prevTrail.offsetLeft - trail.offsetLeft}px, ${prevTrail.offsetTop - trail.offsetTop}px)`;
+        }
+      }
+    }
+    update();
+  </script>
+</body>
+</html>
